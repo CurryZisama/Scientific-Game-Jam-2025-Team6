@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
     public static int ConcreteScore;
 
     // 現在重なっているものを保持する
-    List<Collider> overlapping = new List<Collider>();
+    List<GameObject> overlapping = new List<GameObject>();
 
     void Awake()
     {
@@ -38,42 +38,57 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         moveInput = input.Player.Move.ReadValue<Vector2>();
-        Vector3 move = new Vector3(moveInput.x, 0, moveInput.y);
+        Vector3 move = new Vector3(moveInput.x, moveInput.y, 0 );
         transform.Translate(move * moveSpeed * Time.deltaTime);
     }
 
     // --- 重なり始めたら登録 ---
     void OnTriggerEnter(Collider other)
     {
-        if (!overlapping.Contains(other))
-            overlapping.Add(other);
+        if (!overlapping.Contains(other.gameObject))
+            overlapping.Add(other.gameObject);
     }
 
     // --- 離れたら解除 ---
     void OnTriggerExit(Collider other)
     {
-        overlapping.Remove(other);
+        overlapping.Remove(other.gameObject);
     }
 
     // --- クリックされたときに重なっているものを利用 ---
     void OnClick()
     {
-        foreach (var obj in overlapping)
+        // null のオブジェクトをリストから削除
+        overlapping.RemoveAll(obj => obj == null);
+
+        // コピーしてループ
+        foreach (var obj in new List<GameObject>(overlapping))
         {
             if (obj.CompareTag("CO2"))
             {
-                Debug.Log("CO2 に重なってる: " + obj.name);
+                GetCO2();
+                overlapping.Remove(obj); // リストから削除
+                Destroy(obj);            // シーンから消す
             }
             else if (obj.CompareTag("Concrete"))
             {
-                Debug.Log("Concrete に重なってる: " + obj.name);
+                GetConcrete();
+                overlapping.Remove(obj);
+                Destroy(obj);
             }
         }
     }
 
+
     void GetCO2()
     {
         CO2Score++;
-        //CO2ScoreUI.text =;
+        CO2ScoreUI.text = "CO2Score: " + CO2Score;
+    }
+
+    void GetConcrete()
+    {
+        ConcreteScore++;
+        ConcreteScoreUI.text = "ConcreteScore: " + ConcreteScore;
     }
 }
