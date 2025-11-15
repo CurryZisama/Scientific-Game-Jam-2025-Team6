@@ -9,6 +9,8 @@ public class ButtonFllow : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     public GameObject targetObject;
     
+    public GameObject targetObject2;
+    
     public string FADE = "FADE";
     
     [Header("拡大・縮小設定")]
@@ -74,7 +76,7 @@ public class ButtonFllow : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
 // targetObject.SetActive(true);
 
-        targetAnimator.SetTrigger("FADE");
+        targetAnimator.SetTrigger(FADE);
 
 
     }
@@ -86,6 +88,13 @@ public class ButtonFllow : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     {
 
         targetObject.SetActive(!targetObject.activeSelf);
+
+    }
+    public void ClickEvent2()
+
+    {
+
+        targetObject2.SetActive(!targetObject2.activeSelf);
 
     }
 }

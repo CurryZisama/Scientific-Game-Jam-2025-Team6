@@ -1,7 +1,8 @@
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
 public class FADEScript : MonoBehaviour
 {
+    public string sceneName = "SceneName";
     public GameObject targetObject;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -26,5 +27,14 @@ public class FADEScript : MonoBehaviour
             Debug.LogError("targetObjectがインスペクターで設定されていません！");
         }
     
+    }
+
+    public void PlayFade()
+    {
+        SceneManager.LoadScene(sceneName);
+    }
+    public void QuitApplication()
+    {
+        Application.Quit();
     }
 }
