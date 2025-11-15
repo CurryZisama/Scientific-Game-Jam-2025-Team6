@@ -12,6 +12,8 @@ public class GameDirector : MonoBehaviour
     [SerializeField] private Image clockImage; // 円形ゲージ用 UI Image
     [SerializeField] private Text clockText;
 
+    public static bool isClear = false;
+
     private void Start()
     {
         GameOverTime = TimeLimit;
@@ -29,6 +31,7 @@ public class GameDirector : MonoBehaviour
         if (CO2Count.InstanceCount >= GameOverCount)
         {
             SceneManager.LoadScene("EndScene");
+            isClear = false ;
             return;
         }
 
@@ -54,6 +57,7 @@ public class GameDirector : MonoBehaviour
             // タイムアップでシーン遷移
             if (GameOverTime <= 0f)
             {
+                isClear = true;
                 SceneManager.LoadScene("EndScene");
             }
         }
