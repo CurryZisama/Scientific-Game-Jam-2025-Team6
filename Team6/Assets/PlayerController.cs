@@ -255,12 +255,34 @@ public class PlayerController : MonoBehaviour
         aura.Stop();
         aura.Clear();
 
+        // GameObject obj = Instantiate(prefabToSpawn, spriteToUse.transform.position, spriteToUse.transform.rotation);
+        // var script = obj.GetComponent<MoveAndShrinkBySpeed>();
+        // if (script != null)
+        // {
+        //     if (prefabToSpawn == rareCrystalPrefab) script.crystalUI = rareCrystalUI;
+        //     else script.crystalUI = crystalUI;
+        // }
+        // プレハブを生成
         GameObject obj = Instantiate(prefabToSpawn, spriteToUse.transform.position, spriteToUse.transform.rotation);
+        
+        // スクリプトを取得
         var script = obj.GetComponent<MoveAndShrinkBySpeed>();
+
+        // ★ 3. 取得したスクリプトに「レアかどうか」を教える
         if (script != null)
         {
-            if (prefabToSpawn == rareCrystalPrefab) script.crystalUI = rareCrystalUI;
-            else script.crystalUI = crystalUI;
+            if (prefabToSpawn == rareCrystalPrefab)
+            {
+                // レアプレハブの場合
+                script.isRare = true; // "あなたはレアです" と教える
+                script.crystalUI = rareCrystalUI; // (元のコード)
+            }
+            else
+            {
+                // 通常プレハブの場合
+                script.isRare = false; // "あなたはレアではありません" と教える
+                script.crystalUI = crystalUI; // (元のコード)
+            }
         }
     }
 
