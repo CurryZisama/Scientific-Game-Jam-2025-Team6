@@ -43,7 +43,7 @@ public class PlayerController : MonoBehaviour
     bool inCrystalZone = false;
     float zoneTimer = 0f;
 
-    bool? willSpawnRare = null;
+    bool willSpawnRare = false;
 
     bool firstHaveMaterials = true;
 
@@ -153,7 +153,6 @@ public class PlayerController : MonoBehaviour
             if (zoneTimer >= CreateCrystalTime)
             {
                 DoCrystalReaction();
-                zoneTimer = 0f;
                 createCrystal.Stop();
                 rareCreateCrystal.Stop();
             }
@@ -185,6 +184,7 @@ public class PlayerController : MonoBehaviour
         if (other.CompareTag("Magnesium"))
         {
             willSpawnRare = true;
+            Destroy(other.gameObject);
         }
     }
 
@@ -243,7 +243,7 @@ public class PlayerController : MonoBehaviour
             spriteToUse = crystalSprite;
         }
 
-        willSpawnRare = null;
+        willSpawnRare = false;
 
         GameObject obj = Instantiate(prefabToSpawn, spriteToUse.transform.position, spriteToUse.transform.rotation);
         var script = obj.GetComponent<MoveAndShrinkBySpeed>();

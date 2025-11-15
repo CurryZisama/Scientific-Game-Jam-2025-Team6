@@ -9,6 +9,7 @@ TagManager:
   - CrystalZone
   - rare
   - normal
+  - Magnesium
   layers:
   - Default
   - TransparentFX
