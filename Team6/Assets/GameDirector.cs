@@ -30,7 +30,7 @@ public class GameDirector : MonoBehaviour
         // 上限到達でゲームオーバー
         if (CO2Count.InstanceCount >= GameOverCount)
         {
-            SceneManager.LoadScene("EndScene");
+            SceneManager.LoadScene("ResultScene");
             isClear = false ;
             return;
         }
@@ -58,7 +58,7 @@ public class GameDirector : MonoBehaviour
             if (GameOverTime <= 0f)
             {
                 isClear = true;
-                SceneManager.LoadScene("EndScene");
+                SceneManager.LoadScene("ResultScene");
             }
         }
     }
