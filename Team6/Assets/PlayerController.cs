@@ -136,6 +136,8 @@ public class PlayerController : MonoBehaviour
         {
             GetCO2(-1);
             GetConcrete(-1);
+            zoneTimer = 0f;
+            UpdateCrystalAlpha();
             GameObject obj = Instantiate(crystalPrefab, crystalSprite.gameObject.transform.position, crystalSprite.gameObject.transform.rotation);
             var script = obj.GetComponent<MoveAndShrinkBySpeed>();
             if (script != null)
