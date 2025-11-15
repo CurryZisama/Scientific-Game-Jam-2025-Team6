@@ -116,11 +116,6 @@ public class PlayerController : MonoBehaviour
         // 移動
         transform.Translate(new Vector3(moveInput.x, moveInput.y, 0f) * moveSpeed * Time.deltaTime);
 
-        //if (moveInput.magnitude > 0f)
-        //    moveInput.Normalize();
-
-        //transform.Translate(new Vector3(moveInput.x, moveInput.y, 0f) * moveSpeed * Time.deltaTime);
-
         // 画面内に閉じ込める
         Vector3 pos = transform.position;
         pos.x = Mathf.Clamp(pos.x, -8.33f, 8.33f);
@@ -144,11 +139,6 @@ public class PlayerController : MonoBehaviour
         {
             if (zoneTimer == 0f && CO2Score > 0 && ConcreteScore > 0)
             {
-                if (willSpawnRare == null)
-                {
-                    willSpawnRare = Random.value < rareSpawnChance;
-                }
-
                 // 効果音
                 if (willSpawnRare == true) rareCreateCrystal.Play();
                 else createCrystal.Play();
@@ -190,6 +180,11 @@ public class PlayerController : MonoBehaviour
         {
             inCrystalZone = true;
             zoneTimer = 0f;
+        }
+
+        if (other.CompareTag("Magnesium"))
+        {
+            willSpawnRare = true;
         }
     }
 
