@@ -30,16 +30,26 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject rareCrystalPrefab;      // レア鉱石Prefab
     [SerializeField] private float rareSpawnChance = 0.1f;      // レア生成確率
 
+    [SerializeField] private SpriteRenderer GoSprite;
+
     private Animator animator;
     private SpriteRenderer spriteRenderer;
 
     public static int CO2Score;
     public static int ConcreteScore;
+    public static int CrystalScore;
+    public static int RareCrystalScore;
 
     bool inCrystalZone = false;
     float zoneTimer = 0f;
 
     bool? willSpawnRare = null;
+
+    bool firstHaveMaterials = true;
+
+    private float alpha = 0f;
+    private int direction = 1; // 1: 増加, -1: 減少
+    float fadeSpeed = 2f;    // 透明度変化速度
 
     private void Start()
     {
@@ -52,6 +62,33 @@ public class PlayerController : MonoBehaviour
     {
         // 移動入力（新Input System）
         Vector2 moveInput = Vector2.zero;
+
+        if (firstHaveMaterials)
+        {
+            if(CO2Score > 0 && ConcreteScore > 0)
+            {
+                // αを変化させる
+                alpha += direction * fadeSpeed * Time.deltaTime;
+
+                // 0〜1の範囲に制限
+                if (alpha > 1f)
+                {
+                    alpha = 1f;
+                    direction = -1; // 減少に切り替え
+                }
+                else if (alpha < 0f)
+                {
+                    alpha = 0f;
+                    direction = 1; // 増加に切り替え
+                }
+
+                // αを適用
+                Color c = GoSprite.color;
+                c.a = alpha;
+                GoSprite.color = c;
+
+            }
+        }
 
         if (Keyboard.current != null)
         {
@@ -172,6 +209,11 @@ public class PlayerController : MonoBehaviour
     void DoCrystalReaction()
     {
         if (CO2Score <= 0 || ConcreteScore <= 0) return;
+
+        firstHaveMaterials = false;
+        Color c = GoSprite.color;
+        c.a = 0;
+        GoSprite.color = c;
 
         GetCO2(-1);
         GetConcrete(-1);

@@ -45,6 +45,13 @@ public class MoveAndShrinkBySpeed : MonoBehaviour
         }
 
         current += 1;
+
+        if (this.gameObject.CompareTag("rare"))
+        {
+            PlayerController.CrystalScore = current;
+        }
+        else { PlayerController.RareCrystalScore = current; }
+
         crystalUI.text = current.ToString();
     }
 }
