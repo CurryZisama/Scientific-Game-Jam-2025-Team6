@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
@@ -6,16 +6,20 @@ public class PlayerController : MonoBehaviour
     public float StartMoveSpeed = 5f;
     private float moveSpeed;
 
-    public int MaxScore = 100;     // d‚İ‚É‰‚¶‚½Å‘åƒXƒRƒA
+    public int MaxScore = 100;     // é‡ã¿ã«å¿œã˜ãŸæœ€å¤§ã‚¹ã‚³ã‚¢
     public float MinMoveSpeed = 1f;
 
-    // ƒXƒRƒA‚Ìd‚İ
-    public float CO2Weight = 0.3f;       // CO2‚ÍŒy‚ß
-    public float ConcreteWeight = 1.0f;  // Concrete‚Íd‚ß
+    // ã‚¹ã‚³ã‚¢ã®é‡ã¿
+    public float CO2Weight = 0.3f;       // CO2ã¯è»½ã‚
+    public float ConcreteWeight = 1.0f;  // Concreteã¯é‡ã‚
 
     [SerializeField] private Text CO2ScoreUI;
     [SerializeField] private Text ConcreteScoreUI;
     [SerializeField] private float CreateCrystalTime = 1f;
+    [SerializeField] private SpriteRenderer crystalSprite;
+
+    [SerializeField] private GameObject crystalPrefab;
+    [SerializeField] private Text crystalUI;    // Scene ä¸Šã® UI
 
     private Animator animator;
     private SpriteRenderer spriteRenderer;
@@ -28,10 +32,10 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        // ©•ª‚Ì GameObject ‚É‚Â‚¢‚Ä‚¢‚é Animator ‚ğæ“¾
+        // è‡ªåˆ†ã® GameObject ã«ã¤ã„ã¦ã„ã‚‹ Animator ã‚’å–å¾—
         animator = GetComponent<Animator>();
 
-        // SpriteRenderer ‚à“¯‚¶‚­æ“¾
+        // SpriteRenderer ã‚‚åŒã˜ãå–å¾—
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
@@ -43,21 +47,21 @@ public class PlayerController : MonoBehaviour
         Vector3 move = new Vector3(x, y, 0);
         transform.Translate(move * moveSpeed * Time.deltaTime);
 
-        // ¶‰E”½“]
+        // å·¦å³åè»¢
         if (x < 0)
-            spriteRenderer.flipX = false; // ‰EŒü‚«
+            spriteRenderer.flipX = false; // å³å‘ã
         else if (x > 0)
-            spriteRenderer.flipX = true;  // ¶Œü‚«
+            spriteRenderer.flipX = true;  // å·¦å‘ã
 
         bool isWalking = x != 0 || y != 0;
 
-        // Animator ‚Ì speed ‚ÅƒAƒjƒ[ƒVƒ‡ƒ“Ä¶ / ’â~
+        // Animator ã® speed ã§ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³å†ç”Ÿ / åœæ­¢
         if (isWalking)
-            animator.speed = 1f; // ’Êí‘¬“x‚ÅÄ¶
+            animator.speed = 1f; // é€šå¸¸é€Ÿåº¦ã§å†ç”Ÿ
         else
-            animator.speed = 0f; // ’â~ ¨ ÅŒã‚ÌƒtƒŒ[ƒ€‚Å~‚Ü‚é
+            animator.speed = 0f; // åœæ­¢ â†’ æœ€å¾Œã®ãƒ•ãƒ¬ãƒ¼ãƒ ã§æ­¢ã¾ã‚‹
 
-        // --- ‘¬“xŒvZ‚âƒNƒŠƒXƒ^ƒ‹ˆ—‚Í‚»‚Ì‚Ü‚Ü ---
+        // --- é€Ÿåº¦è¨ˆç®—ã‚„ã‚¯ãƒªã‚¹ã‚¿ãƒ«å‡¦ç†ã¯ãã®ã¾ã¾ ---
         float weightedScore = CO2Score * CO2Weight + ConcreteScore * ConcreteWeight;
         float t = Mathf.Clamp01(weightedScore / MaxScore);
         moveSpeed = Mathf.Lerp(StartMoveSpeed, MinMoveSpeed, t);
@@ -65,6 +69,10 @@ public class PlayerController : MonoBehaviour
         if (inCrystalZone)
         {
             zoneTimer += Time.deltaTime;
+            if (CO2Score > 0 && ConcreteScore > 0)
+            {
+                UpdateCrystalAlpha();
+            }
 
             if (zoneTimer >= CreateCrystalTime)
             {
@@ -74,7 +82,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // --- 2DƒgƒŠƒK[ ---
+    // --- 2Dãƒˆãƒªã‚¬ãƒ¼ ---
     void OnTriggerEnter2D(Collider2D other)
     {
         Debug.Log(other.name);
@@ -106,6 +114,7 @@ public class PlayerController : MonoBehaviour
         {
             inCrystalZone = false;
             zoneTimer = 0f;
+            UpdateCrystalAlpha();
         }
     }
 
@@ -127,6 +136,25 @@ public class PlayerController : MonoBehaviour
         {
             GetCO2(-1);
             GetConcrete(-1);
+            GameObject obj = Instantiate(crystalPrefab, crystalSprite.gameObject.transform.position, crystalSprite.gameObject.transform.rotation);
+            var script = obj.GetComponent<MoveAndShrinkBySpeed>();
+            if (script != null)
+            {
+                script.crystalUI = crystalUI;
+            }
+
         }
+    }
+
+    private void UpdateCrystalAlpha()
+    {
+        if (crystalSprite == null) return;
+
+        // 0ã€œ1ã®ç¯„å›²ã«æ­£è¦åŒ–
+        float alpha = Mathf.Clamp01(zoneTimer / CreateCrystalTime);
+
+        Color color = crystalSprite.color;
+        color.a = alpha;
+        crystalSprite.color = color;
     }
 }
