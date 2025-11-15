@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems; // UIイベントインターフェースのために必要
 
+
 // 必要なインターフェースを継承します
 public class ButtonFllow : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
@@ -72,9 +73,11 @@ public class ButtonFllow : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     {
 
-// Animatorのトリガーを設定し、アニメーションを再生します
+        // Animatorのトリガーを設定し、アニメーションを再生します
 
-// targetObject.SetActive(true);
+        // targetObject.SetActive(true);
+
+        Debug.Log("Clickしたよ");
 
         targetAnimator.SetTrigger(FADE);
 

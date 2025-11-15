@@ -4,21 +4,19 @@ using UnityEngine.InputSystem;
 public class CameraMove : MonoBehaviour
 {
     // === 公開変数 (インスペクターで設定) ===
-
     [Header("追従設定")]
     // カメラの移動速度（大きいほど早く追従）
     public float followSpeed = 5.0f;
 
     // カメラが初期位置から動ける最大距離（例: 2.0f = X/Y方向に最大2メートル動ける）
     public float maxMoveDistance = 2.0f;
-    
+
     // マウスの動きに対するカメラの反応度 (大きいほどマウスの僅かな動きで大きくカメラが動く)
-    public float sensitivity = 0.1f; 
+    public float sensitivity = 0.1f;
 
     // === プライベート変数 ===
-
     // カメラの初期位置を保存
-    private Vector3 initialPosition; 
+    private Vector3 initialPosition;
 
     void Start()
     {
@@ -29,7 +27,6 @@ public class CameraMove : MonoBehaviour
     void Update()
     {
         // 1. マウスの入力処理とオフセットの計算
-        
         // 「新しい入力システム」でマウスのスクリーン座標 (Vector2) を取得
         Vector2 mousePos = Mouse.current.position.ReadValue();
 
@@ -45,12 +42,10 @@ public class CameraMove : MonoBehaviour
         );
 
         // 2. 最終的な目標位置の計算
-
         // 初期位置に計算したオフセットを加えたものが、理想的な目標位置
         Vector3 desiredTargetPosition = initialPosition + targetOffset;
 
         // 3. 最大移動距離による制限（クランプ）
-
         // 初期位置から目標位置へのベクトルを計算
         Vector3 displacementFromInitial = desiredTargetPosition - initialPosition;
 
@@ -61,9 +56,7 @@ public class CameraMove : MonoBehaviour
         // 制限されたベクトルを初期位置に加え、最終的な目標位置を決定
         Vector3 finalTargetPosition = initialPosition + displacementFromInitial;
 
-
         // 4. 現在の位置から目標位置へ滑らかに移動
-
         // Lerp（線形補間）を使って、現在の位置から目標位置へ滑らかに移動させます
         // followSpeed が大きいほど早く追従し、滑らかさが減ります。
         transform.position = Vector3.Lerp(
