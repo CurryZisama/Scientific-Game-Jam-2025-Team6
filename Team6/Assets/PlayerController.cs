@@ -3,11 +3,22 @@ using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
-    public float moveSpeed = 5f;
+    public float StartMoveSpeed = 5f;
+    private float moveSpeed;
+
+    public int MaxScore = 100;     // 重みに応じた最大スコア
+    public float MinMoveSpeed = 1f;
+
+    // スコアの重み
+    public float CO2Weight = 0.3f;       // CO2は軽め
+    public float ConcreteWeight = 1.0f;  // Concreteは重め
 
     [SerializeField] private Text CO2ScoreUI;
     [SerializeField] private Text ConcreteScoreUI;
     [SerializeField] private float CreateCrystalTime = 1f;
+
+    private Animator animator;
+    private SpriteRenderer spriteRenderer;
 
     public static int CO2Score;
     public static int ConcreteScore;
@@ -15,14 +26,41 @@ public class PlayerController : MonoBehaviour
     bool inCrystalZone = false;
     float zoneTimer = 0f;
 
+    private void Start()
+    {
+        // 自分の GameObject についている Animator を取得
+        animator = GetComponent<Animator>();
+
+        // SpriteRenderer も同じく取得
+        spriteRenderer = GetComponent<SpriteRenderer>();
+    }
+
     void Update()
     {
-        // ★ 新InputSystemなし：Input.GetAxisを使う
         float x = Input.GetAxisRaw("Horizontal");
         float y = Input.GetAxisRaw("Vertical");
 
         Vector3 move = new Vector3(x, y, 0);
         transform.Translate(move * moveSpeed * Time.deltaTime);
+
+        // 左右反転
+        if (x < 0)
+            spriteRenderer.flipX = false; // 右向き
+        else if (x > 0)
+            spriteRenderer.flipX = true;  // 左向き
+
+        bool isWalking = x != 0 || y != 0;
+
+        // Animator の speed でアニメーション再生 / 停止
+        if (isWalking)
+            animator.speed = 1f; // 通常速度で再生
+        else
+            animator.speed = 0f; // 停止 → 最後のフレームで止まる
+
+        // --- 速度計算やクリスタル処理はそのまま ---
+        float weightedScore = CO2Score * CO2Weight + ConcreteScore * ConcreteWeight;
+        float t = Mathf.Clamp01(weightedScore / MaxScore);
+        moveSpeed = Mathf.Lerp(StartMoveSpeed, MinMoveSpeed, t);
 
         if (inCrystalZone)
         {
@@ -74,13 +112,13 @@ public class PlayerController : MonoBehaviour
     void GetCO2(int count)
     {
         CO2Score += count;
-        CO2ScoreUI.text = "CO2Score: " + CO2Score;
+        CO2ScoreUI.text = CO2Score.ToString();
     }
 
     void GetConcrete(int count)
     {
         ConcreteScore += count;
-        ConcreteScoreUI.text = "ConcreteScore: " + ConcreteScore;
+        ConcreteScoreUI.text = ConcreteScore.ToString();
     }
 
     void DoCrystalReaction()
