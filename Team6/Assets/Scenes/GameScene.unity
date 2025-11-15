@@ -1991,14 +1991,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 970d97ceb4c6ed34ba46208c4a282bcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  StartMoveSpeed: 5
+  StartMoveSpeed: 6
   MaxScore: 100
-  MinMoveSpeed: 1
-  CO2Weight: 0.3
-  ConcreteWeight: 1
+  MinMoveSpeed: 0.4
+  CO2Weight: 1
+  ConcreteWeight: 1.7
   CO2ScoreUI: {fileID: 63784187}
   ConcreteScoreUI: {fileID: 652986785}
-  CreateCrystalTime: 1
+  CreateCrystalTime: 0.8
   crystalUI: {fileID: 293311497}
   rareCrystalUI: {fileID: 968700920}
   pick: {fileID: 2093228222}
