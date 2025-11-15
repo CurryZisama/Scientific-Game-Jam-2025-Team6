@@ -83,6 +83,10 @@ public class ButtonFllow : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
 
     }
+    public void PushButtonQuitApplication()
+    {
+        Application.Quit();
+    }
 
 
 
