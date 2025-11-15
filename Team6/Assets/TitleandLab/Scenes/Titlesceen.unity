@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -411,7 +411,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetAnimator: {fileID: 0}
   targetObject: {fileID: 1402058147}
-  targetObject2: {fileID: 0}
+  targetObject2: {fileID: 1070905777}
   FADE: FADE
   enlargedScale: {x: 1.25, y: 1.25, z: 1.25}
   scaleSpeed: 10
@@ -1133,7 +1133,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetAnimator: {fileID: 0}
   targetObject: {fileID: 1070905777}
-  targetObject2: {fileID: 0}
+  targetObject2: {fileID: 1402058147}
   FADE: FADE
   enlargedScale: {x: 1.25, y: 1.25, z: 1.25}
   scaleSpeed: 10
