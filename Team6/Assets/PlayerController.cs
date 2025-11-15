@@ -45,23 +45,29 @@ public class PlayerController : MonoBehaviour
         float y = Input.GetAxisRaw("Vertical");
 
         Vector3 move = new Vector3(x, y, 0);
+
+        // 斜めでも速度が一定になるようにする
+        if (move.magnitude > 0f)
+            move = move.normalized;
+
         transform.Translate(move * moveSpeed * Time.deltaTime);
 
+        // 画面内に閉じ込める
+        Vector3 pos = transform.position;
+        pos.x = Mathf.Clamp(pos.x, -8.33f, 8.33f);
+        pos.y = Mathf.Clamp(pos.y, -4.08f, 4.08f);
+        transform.position = pos;
+
         // 左右反転
-        if (x < 0)
-            spriteRenderer.flipX = false; // 右向き
-        else if (x > 0)
-            spriteRenderer.flipX = true;  // 左向き
+        if (x < 0) spriteRenderer.flipX = false;
+        else if (x > 0) spriteRenderer.flipX = true;
 
         bool isWalking = x != 0 || y != 0;
 
-        // Animator の speed でアニメーション再生 / 停止
-        if (isWalking)
-            animator.speed = 1f; // 通常速度で再生
-        else
-            animator.speed = 0f; // 停止 → 最後のフレームで止まる
+        // アニメ再生/停止
+        animator.speed = isWalking ? 1f : 0f;
 
-        // --- 速度計算やクリスタル処理はそのまま ---
+        // 加速・減速処理はそのまま
         float weightedScore = CO2Score * CO2Weight + ConcreteScore * ConcreteWeight;
         float t = Mathf.Clamp01(weightedScore / MaxScore);
         moveSpeed = Mathf.Lerp(StartMoveSpeed, MinMoveSpeed, t);
@@ -70,9 +76,7 @@ public class PlayerController : MonoBehaviour
         {
             zoneTimer += Time.deltaTime;
             if (CO2Score > 0 && ConcreteScore > 0)
-            {
                 UpdateCrystalAlpha();
-            }
 
             if (zoneTimer >= CreateCrystalTime)
             {
@@ -81,6 +85,7 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+
 
     // --- 2Dトリガー ---
     void OnTriggerEnter2D(Collider2D other)
