@@ -23,6 +23,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private AudioSource pick;
     [SerializeField] private AudioSource createCrystal;
     [SerializeField] private AudioSource rareCreateCrystal;
+    [SerializeField] private AudioSource getMagnesium;
 
     [SerializeField] private SpriteRenderer crystalSprite;      // 普通のクリスタルUI
     [SerializeField] private SpriteRenderer rareCrystalSprite;  // レア鉱石UI
@@ -51,8 +52,13 @@ public class PlayerController : MonoBehaviour
     private int direction = 1; // 1: 増加, -1: 減少
     float fadeSpeed = 2f;    // 透明度変化速度
 
+    private ParticleSystem aura;
+
     private void Start()
     {
+        aura = GetComponentInChildren<ParticleSystem>();
+        aura.Stop();
+        aura.Clear();
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         moveSpeed = StartMoveSpeed;
@@ -183,6 +189,8 @@ public class PlayerController : MonoBehaviour
 
         if (other.CompareTag("Magnesium"))
         {
+            aura.Play();
+            if(!willSpawnRare) getMagnesium.Play();
             willSpawnRare = true;
             Destroy(other.gameObject);
         }
@@ -244,6 +252,8 @@ public class PlayerController : MonoBehaviour
         }
 
         willSpawnRare = false;
+        aura.Stop();
+        aura.Clear();
 
         GameObject obj = Instantiate(prefabToSpawn, spriteToUse.transform.position, spriteToUse.transform.rotation);
         var script = obj.GetComponent<MoveAndShrinkBySpeed>();
