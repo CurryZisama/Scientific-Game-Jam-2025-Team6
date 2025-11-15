@@ -14,6 +14,9 @@ public class ResultDisplay : MonoBehaviour
     public int crystalScoreValue = 100;     // 通常クリスタルの倍率
     public int rareCrystalScoreValue = 500;   // レア鉱石の倍率
 
+    public AudioSource SEAudio;
+    public AudioClip[] audioClips;
+
     void Start()
     {
         // ステップ1, 2 で蓄積された static 変数を読み込む
@@ -27,17 +30,19 @@ public class ResultDisplay : MonoBehaviour
             // resultTitleText.text = "世界は豊かになった！";
             // resultTitleText.color = Color.yellow; 
             CLEAR.SetActive(!CLEAR.activeSelf);
+            SEAudio.PlayOneShot(audioClips[0]);
         }
         else 
         {
             // resultTitleText.text = "FAILED...";
             // resultTitleText.color = Color.gray;
             FAIL.SetActive(!FAIL.activeSelf);
+            SEAudio.PlayOneShot(audioClips[1]);
         }
 
         // 2. 取得した「数」をそのまま表示
-        crystalText.text = crystalCount.ToString();
-        rareCrystalText.text = rareCrystalCount.ToString();
+        crystalText.text = crystalCount.ToString() + "×100";
+        rareCrystalText.text = rareCrystalCount.ToString() + "×500";
 
         // 3. ★ ご要望の「トータルスコア」を計算
         // ( crystalCount × 100 ) + ( rareCrystalCount × 500 )
