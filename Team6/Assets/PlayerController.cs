@@ -103,10 +103,23 @@ public class PlayerController : MonoBehaviour
             moveInput = new Vector2(x, y);
         }
 
-        if (moveInput.magnitude > 0f)
-            moveInput.Normalize();
+        // ゲームパッド入力
+        if (Gamepad.current != null)
+        {
+            Vector2 stick = Gamepad.current.leftStick.ReadValue();
+            moveInput += stick;  // 左スティックの値を足す
+        }
 
+        // 正規化
+        if (moveInput.magnitude > 1f) moveInput.Normalize();
+
+        // 移動
         transform.Translate(new Vector3(moveInput.x, moveInput.y, 0f) * moveSpeed * Time.deltaTime);
+
+        //if (moveInput.magnitude > 0f)
+        //    moveInput.Normalize();
+
+        //transform.Translate(new Vector3(moveInput.x, moveInput.y, 0f) * moveSpeed * Time.deltaTime);
 
         // 画面内に閉じ込める
         Vector3 pos = transform.position;
