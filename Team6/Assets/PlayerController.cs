@@ -21,6 +21,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject crystalPrefab;
     [SerializeField] private Text crystalUI;    // Scene 上の UI
 
+    [SerializeField] private AudioSource pick;
+    [SerializeField] private AudioSource createCrystal;
+
     private Animator animator;
     private SpriteRenderer spriteRenderer;
 
@@ -32,11 +35,9 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        // 自分の GameObject についている Animator を取得
         animator = GetComponent<Animator>();
-
-        // SpriteRenderer も同じく取得
         spriteRenderer = GetComponent<SpriteRenderer>();
+        moveSpeed = StartMoveSpeed;
     }
 
     void Update()
@@ -46,7 +47,7 @@ public class PlayerController : MonoBehaviour
 
         Vector3 move = new Vector3(x, y, 0);
 
-        // 斜めでも速度が一定になるようにする
+        // 斜め移動を正規化
         if (move.magnitude > 0f)
             move = move.normalized;
 
@@ -62,35 +63,44 @@ public class PlayerController : MonoBehaviour
         if (x < 0) spriteRenderer.flipX = false;
         else if (x > 0) spriteRenderer.flipX = true;
 
-        bool isWalking = x != 0 || y != 0;
-
         // アニメ再生/停止
+        bool isWalking = x != 0 || y != 0;
         animator.speed = isWalking ? 1f : 0f;
 
-        // 加速・減速処理はそのまま
+        // 移動速度調整
         float weightedScore = CO2Score * CO2Weight + ConcreteScore * ConcreteWeight;
         float t = Mathf.Clamp01(weightedScore / MaxScore);
         moveSpeed = Mathf.Lerp(StartMoveSpeed, MinMoveSpeed, t);
 
+        // クリスタルゾーン処理
         if (inCrystalZone)
         {
-            zoneTimer += Time.deltaTime;
-            if (CO2Score > 0 && ConcreteScore > 0)
-                UpdateCrystalAlpha();
+            if (zoneTimer == 0f && CO2Score > 0 && ConcreteScore > 0)
+            {
+                // 作り始めた瞬間に音を鳴らす
+                createCrystal.time = 0f;
+                createCrystal.Play();
+            }
 
+            if (CO2Score > 0 && ConcreteScore > 0)
+            {
+                zoneTimer += Time.deltaTime;
+                UpdateCrystalAlpha();
+            }
+                
             if (zoneTimer >= CreateCrystalTime)
             {
+                // タイマー終了 → 実際にクリスタル生成
                 DoCrystalReaction();
                 zoneTimer = 0f;
+                createCrystal.Stop(); // 再生途中なら止める
             }
         }
+
     }
 
-
-    // --- 2Dトリガー ---
     void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log(other.name);
         if (other.CompareTag("CO2"))
         {
             GetCO2(1);
@@ -107,7 +117,6 @@ public class PlayerController : MonoBehaviour
 
         if (other.CompareTag("CrystalZone"))
         {
-            Debug.Log("CrystalZone");
             inCrystalZone = true;
             zoneTimer = 0f;
         }
@@ -117,6 +126,7 @@ public class PlayerController : MonoBehaviour
     {
         if (other.CompareTag("CrystalZone"))
         {
+            createCrystal.Stop();
             inCrystalZone = false;
             zoneTimer = 0f;
             UpdateCrystalAlpha();
@@ -127,39 +137,45 @@ public class PlayerController : MonoBehaviour
     {
         CO2Score += count;
         CO2ScoreUI.text = CO2Score.ToString();
+        if (count > 0) pick.Play();
     }
 
     void GetConcrete(int count)
     {
         ConcreteScore += count;
         ConcreteScoreUI.text = ConcreteScore.ToString();
+        if (count > 0) pick.Play();
     }
 
     void DoCrystalReaction()
     {
         if (CO2Score > 0 && ConcreteScore > 0)
         {
+            // スコアを減らす
             GetCO2(-1);
             GetConcrete(-1);
+
             zoneTimer = 0f;
             UpdateCrystalAlpha();
-            GameObject obj = Instantiate(crystalPrefab, crystalSprite.gameObject.transform.position, crystalSprite.gameObject.transform.rotation);
+
+            // クリスタル生成
+            GameObject obj = Instantiate(crystalPrefab, crystalSprite.transform.position, crystalSprite.transform.rotation);
             var script = obj.GetComponent<MoveAndShrinkBySpeed>();
             if (script != null)
             {
                 script.crystalUI = crystalUI;
             }
 
+            // 生成時に音を鳴らす
+            createCrystal.time = 0f; // Clip の再生位置を最初に戻す
+            createCrystal.Play();
         }
     }
 
     private void UpdateCrystalAlpha()
     {
         if (crystalSprite == null) return;
-
-        // 0〜1の範囲に正規化
         float alpha = Mathf.Clamp01(zoneTimer / CreateCrystalTime);
-
         Color color = crystalSprite.color;
         color.a = alpha;
         crystalSprite.color = color;
