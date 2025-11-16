@@ -4,6 +4,7 @@ public class MagnesiumMove : MonoBehaviour
 {
     [SerializeField] private float speed = 10f;   // 移動速度
     [SerializeField] private int maxBounce = 6;   // この回数バウンドしたら画面外へ飛ばす
+    private Transform PlayerTransform;
 
     private Vector2 direction;   // 進行方向
     private SpriteRenderer sr;
@@ -20,8 +21,31 @@ public class MagnesiumMove : MonoBehaviour
     void Start()
     {
         sr = GetComponent<SpriteRenderer>();
-        direction = Random.insideUnitCircle.normalized;
+
+        // Find で Player オブジェクトを探す
+        GameObject obj = GameObject.Find("Player");
+        if (obj != null)
+        {
+            PlayerTransform = obj.transform;
+        }
+        else
+        {
+            Debug.LogWarning("Player が見つからなかったよ！");
+            // ここで fallback してもOK
+            PlayerTransform = transform; // とりあえず自分向きとか
+        }
+
+        // ターゲットへ向かうベクトル
+        Vector2 toTarget = (PlayerTransform.position - transform.position).normalized;
+
+        // 直角方向
+        Vector2 right90 = new Vector2(-toTarget.y, toTarget.x);
+        Vector2 left90 = new Vector2(toTarget.y, -toTarget.x);
+
+        // ランダムに左右選択
+        direction = (Random.value < 0.5f ? right90 : left90).normalized;
     }
+
 
     void Update()
     {

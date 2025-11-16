@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
@@ -7,27 +7,57 @@ public class GameDirector : MonoBehaviour
     public int GameOverCount = 20;
     [SerializeField] private Image meterImage;
     [SerializeField] float TimeLimit = 60f;
+    [SerializeField] private Image damage;
+
+    [SerializeField] private float shakeAmountLow = 5f;   // 7å‰²è¶…ãˆ
+    [SerializeField] private float shakeAmountHigh = 12f; // 9å‰²è¶…ãˆ
     private float GameOverTime;
 
-    [SerializeField] private Image clockImage; // ‰~Œ`ƒQ[ƒW—p UI Image
+    private float ShakeSpeed;
+
+    [SerializeField] private Image clockImage; // å††å½¢ã‚²ãƒ¼ã‚¸ç”¨ UI Image
     [SerializeField] private Text clockText;
 
     public static bool isClear = false;
+    private Vector3 defaultPos;
+
+    float fill = 0;
 
     private void Start()
     {
         GameOverTime = TimeLimit;
+
+        if (meterImage != null)
+            defaultPos = meterImage.rectTransform.localPosition;
+
+        ShakeSpeed = 30f;
     }
 
     void Update()
     {
         if (meterImage != null)
         {
-            float fill = Mathf.Clamp01((float)CO2Count.InstanceCount / GameOverCount);
+            fill =  Mathf.Clamp01((float)CO2Count.InstanceCount / GameOverCount);
             meterImage.fillAmount = fill;
         }
 
-        // ãŒÀ“’B‚ÅƒQ[ƒ€ƒI[ƒo[
+        // --- æºã‚Œåˆ¤æ–­ ---
+        if (fill >= 0.9f)
+        {
+            Shake(shakeAmountHigh);
+            AlphaBlink(0.1f, 4f);
+        }
+        else if (fill >= 0.7f)
+        {
+            Shake(shakeAmountLow);
+            AlphaBlink(0.1f, 2f);
+        }
+        else
+        {
+            meterImage.rectTransform.localPosition = defaultPos;
+        }
+
+        // ä¸Šé™åˆ°é”ã§ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼
         if (CO2Count.InstanceCount >= GameOverCount)
         {
             SceneManager.LoadScene("ResultScene");
@@ -35,26 +65,26 @@ public class GameDirector : MonoBehaviour
             return;
         }
 
-        // 2. ŠÔ‚ÅƒQ[ƒ€ƒI[ƒo[
+        // 2. æ™‚é–“ã§ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼
         if (GameOverTime > 0f)
         {
             GameOverTime -= Time.deltaTime;
 
-            // Œv UI ‚ğXV
+            // æ™‚è¨ˆ UI ã‚’æ›´æ–°
             if (clockImage != null)
             {
                 float fill = Mathf.Clamp01(GameOverTime / TimeLimit);
                 clockImage.fillAmount = fill;
             }
 
-            // ƒeƒLƒXƒg UI ‚àXVi•b•\¦j
+            // ãƒ†ã‚­ã‚¹ãƒˆ UI ã‚‚æ›´æ–°ï¼ˆç§’è¡¨ç¤ºï¼‰
             if (clockText != null)
             {
                 int seconds = Mathf.CeilToInt(GameOverTime);
                 clockText.text = seconds.ToString();
             }
 
-            // ƒ^ƒCƒ€ƒAƒbƒv‚ÅƒV[ƒ“‘JˆÚ
+            // ã‚¿ã‚¤ãƒ ã‚¢ãƒƒãƒ—ã§ã‚·ãƒ¼ãƒ³é·ç§»
             if (GameOverTime <= 0f)
             {
                 isClear = true;
@@ -63,4 +93,27 @@ public class GameDirector : MonoBehaviour
         }
     }
 
+
+    void Shake(float amount)
+    {
+        // ãƒ©ãƒ³ãƒ€ãƒ ä½ç½®ã¸æºã‚‰ã™
+        float x = Mathf.Sin(Time.time * ShakeSpeed) * amount;
+        float y = Mathf.Cos(Time.time * ShakeSpeed * 1.3f) * amount;
+        meterImage.rectTransform.localPosition = defaultPos + new Vector3(x, y, 0);
+    }
+
+    void AlphaBlink(float minA = 0f, float maxA = 0.6f, float speed = 4f)
+    {
+        if (damage == null) return;
+
+        // ã‚µã‚¤ãƒ³æ³¢ã§ 0ã€œ1 ã‚’å¾€å¾©
+        float t = (Mathf.Sin(Time.time * speed) + 1f) * 0.5f;
+
+        // t ã‚’ Î± ã«å¤‰æ›
+        float alpha = Mathf.Lerp(minA, maxA, t);
+
+        Color c = damage.color;
+        c.a = alpha;
+        damage.color = c;
+    }
 }
