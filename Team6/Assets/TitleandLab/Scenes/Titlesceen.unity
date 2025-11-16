@@ -1447,7 +1447,7 @@ MonoBehaviour:
   targetObject: {fileID: 0}
   targetObject2: {fileID: 0}
   FADE: FADE
-  enlargedScale: {x: 1.3, y: 1.1, z: 1.3}
+  enlargedScale: {x: 1.22, y: 1.1, z: 1.22}
   scaleSpeed: 10
 --- !u!114 &368202315
 MonoBehaviour:
