@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEditor;
 using UnityEngine.EventSystems; // UIイベントインターフェースのために必要
 
 
@@ -85,7 +86,16 @@ public class ButtonFllow : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     }
     public void PushButtonQuitApplication()
     {
-        Application.Quit();
+#if UNITY_EDITOR
+        // エディタの再生モードを停止する
+        EditorApplication.isPlaying = false;
+        
+        // 3. 「それ以外（つまりビルドされたゲーム）なら」
+#else
+            // ゲームを終了する
+            Application.Quit();
+#endif
+        // Application.Quit();
     }
 
 
@@ -103,5 +113,19 @@ public class ButtonFllow : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
         targetObject2.SetActive(!targetObject2.activeSelf);
 
+    }
+
+    public void StartEvent()
+    {
+        if (targetObject.activeSelf == true) 
+        {
+            // targetObject.SetActive(!targetObject.activeSelf);
+            Debug.Log("Startしてるよ" + this.gameObject.name);
+        }
+        else
+        {
+            targetObject.SetActive(!targetObject.activeSelf);
+            targetObject2.SetActive(!targetObject2.activeSelf);
+        }
     }
 }
